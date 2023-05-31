@@ -1,0 +1,42 @@
+name: "build-test"
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'releases/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set rustup profile & toolchain
+        run: |
+          rustup set profile minimal
+          rustup toolchain install stable
+
+      - name: Install
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - run: cargo test
+      - run: wasm-pack test --headless --chrome
+      - run: wasm-pack test --headless --firefox
+      
+      - run: wasm-pack build
+      - run: wasm-pack pack
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wasm
+          path: pkg/*.tgz
+
+      - run: cargo package
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cargo-package
+          path: target/package/
+
+      

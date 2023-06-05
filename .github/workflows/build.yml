@@ -24,7 +24,7 @@ jobs:
       - run: wasm-pack test --headless --chrome
       - run: wasm-pack test --headless --firefox
       
-      - run: wasm-pack build
+      - run: wasm-pack build --target nodejs
       - run: wasm-pack pack
 
       - uses: actions/upload-artifact@v3
